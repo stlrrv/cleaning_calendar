@@ -3,8 +3,16 @@
 
 :root {
   --app-bg:
-    radial-gradient(circle at top left, rgba(36, 183, 154, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(62, 126, 236, 0.16), transparent 24%),
+    radial-gradient(
+      circle at top left,
+      rgba(36, 183, 154, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(62, 126, 236, 0.16),
+      transparent 24%
+    ),
     linear-gradient(160deg, #0f1725 0%, #162235 52%, #0d1320 100%);
   --app-text: #e8f1ef;
   --app-muted: rgba(232, 241, 239, 0.72);
@@ -19,10 +27,43 @@
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
-:root[data-theme='light'] {
+:root.dark {
   --app-bg:
-    radial-gradient(circle at top left, rgba(43, 190, 154, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(80, 134, 244, 0.14), transparent 22%),
+    radial-gradient(
+      circle at top left,
+      rgba(36, 183, 154, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(62, 126, 236, 0.16),
+      transparent 24%
+    ),
+    linear-gradient(160deg, #0f1725 0%, #162235 52%, #0d1320 100%);
+  --app-text: #e8f1ef;
+  --app-muted: rgba(232, 241, 239, 0.72);
+  --app-surface: rgba(11, 18, 30, 0.72);
+  --app-surface-strong: rgba(255, 255, 255, 0.05);
+  --app-border: rgba(164, 224, 208, 0.12);
+  --app-input: rgba(5, 11, 18, 0.7);
+  --app-accent: #68dbc0;
+  --app-accent-strong: linear-gradient(135deg, #59d2b4 0%, #4c87ff 100%);
+  --app-danger: rgba(255, 123, 123, 0.14);
+  --app-shadow: 0 20px 60px rgba(5, 10, 18, 0.3);
+}
+
+:root.light {
+  --app-bg:
+    radial-gradient(
+      circle at top left,
+      rgba(43, 190, 154, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(80, 134, 244, 0.14),
+      transparent 22%
+    ),
     linear-gradient(180deg, #f5fbff 0%, #edf3fb 52%, #e8f2f3 100%);
   --app-text: #183040;
   --app-muted: rgba(24, 48, 64, 0.74);

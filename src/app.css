@@ -82,7 +82,7 @@
 }
 
 .layout-grid {
-  grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(280px, 0.85fr));
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.85fr);
 }
 
 .layout-grid--schedule {
@@ -107,7 +107,7 @@
 }
 
 .month-actions,
-.toolbar-actions {
+.stack-item-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -132,6 +132,9 @@
   border-radius: 20px;
   background: var(--app-surface-strong);
   border: 1px solid var(--app-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .tabs-row,
@@ -145,7 +148,13 @@
 
 .toggle-row {
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.stack-item-actions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .tabs-row {

@@ -158,7 +158,13 @@ function persistState() {
 
 function applyTheme(nextTheme) {
   theme.value = nextTheme;
-  document.documentElement.dataset.theme = nextTheme;
+  if (nextTheme === "light") {
+    document.documentElement.classList.add("light");
+    document.documentElement.classList.remove("dark");
+  } else {
+    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("light");
+  }
   localStorage.setItem(THEME_KEY, nextTheme);
 }
 
@@ -183,7 +189,15 @@ async function initialize() {
 
   try {
     const localTheme = localStorage.getItem(THEME_KEY);
-    applyTheme(localTheme === "light" ? "light" : "dark");
+    // Сначала принудительно установим тему, чтобы классы были применены
+    if (localTheme === "light") {
+      document.documentElement.classList.add("light");
+      document.documentElement.classList.remove("dark");
+    } else {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
+    }
+    theme.value = localTheme === "light" ? "light" : "dark";
 
     const localState = localStorage.getItem(STORAGE_KEY);
     if (localState) {
@@ -598,7 +612,7 @@ onMounted(() => {
               </label>
             </div>
 
-            <div class="toolbar-actions">
+            <div class="stack-item-actions">
               <B24Button color="air-tertiary" @click="triggerImport"
                 >Импорт JSON</B24Button
               >
@@ -648,10 +662,12 @@ onMounted(() => {
                   <span>Имя</span>
                   <B24Input v-model="employee.name" />
                 </label>
-                <label class="toggle-row">
-                  <B24Checkbox v-model="employee.active" />
-                  <span>Участвует в ротации</span>
-                </label>
+                <div class="stack-item-actions">
+                  <label class="toggle-row">
+                    <B24Checkbox v-model="employee.active" />
+                    <span>Участвует в ротации</span>
+                  </label>
+                </div>
                 <B24Button
                   color="air-tertiary"
                   @click="removeEmployee(employee.id)"
@@ -691,9 +707,11 @@ onMounted(() => {
                   <span>Описание</span>
                   <B24Textarea v-model="duty.description" rows="3" />
                 </label>
-                <B24Button color="air-tertiary" @click="removeDuty(duty.id)"
-                  >Удалить</B24Button
-                >
+                <div class="stack-item-actions">
+                  <B24Button color="air-tertiary" @click="removeDuty(duty.id)"
+                    >Удалить</B24Button
+                  >
+                </div>
               </template>
               <template v-else>
                 <h3>{{ duty.title }}</h3>

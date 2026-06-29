@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "company": {
+    "name": "Zezeba",
+    "workingDays": [1, 2, 3, 4, 5]
+  },
+  "employees": [
+    {
+      "id": "vadim",
+      "name": "Вадим",
+      "active": true
+    },
+    {
+      "id": "danil",
+      "name": "Данил",
+      "active": true
+    },
+    {
+      "id": "kristina",
+      "name": "Кристина",
+      "active": true
+    },
+    {
+      "id": "nikita",
+      "name": "Никита",
+      "active": true
+    },
+    {
+      "id": "ilya",
+      "name": "Илья",
+      "active": true
+    },
+    {
+      "id": "aleksey",
+      "name": "Алексей",
+      "active": true
+    },
+    {
+      "id": "mikhail",
+      "name": "Михаил",
+      "active": true
+    }
+  ],
+  "duties": [
+    {
+      "id": "duty-1",
+      "title": "Обеденный стол",
+      "description": "Протереть стол, убрать крошки и пятна."
+    },
+    {
+      "id": "duty-2",
+      "title": "Микроволновка",
+      "description": "Открыть и проветрить, проверить чистоту стенок и тарелки, убрать пыль."
+    },
+    {
+      "id": "duty-3",
+      "title": "Стол с чайником",
+      "description": "Протереть стол, убрать рассыпанный чай и сахар, аккуратно расставить предметы и кружки."
+    },
+    {
+      "id": "duty-4",
+      "title": "Диспенсер",
+      "description": "Протереть снаружи, убрать подтеки."
+    },
+    {
+      "id": "duty-5",
+      "title": "Бутыль с водой",
+      "description": "Заменить, если в текущей закончилась вода."
+    },
+    {
+      "id": "duty-6",
+      "title": "Холодильник",
+      "description": "Проверить, что нет испорченных продуктов, ничего не течет, дверца закрыта."
+    },
+    {
+      "id": "duty-7",
+      "title": "Мусорное ведро",
+      "description": "Если ведро заполнено наполовину, заменить пакет и вынести мусор."
+    },
+    {
+      "id": "duty-8",
+      "title": "Пол",
+      "description": "Подмести."
+    },
+    {
+      "id": "duty-9",
+      "title": "Вода",
+      "description": "Заказать воду, если осталось меньше 2-х бутылок."
+    }
+  ],
+  "schedule": {
+    "rotationOrder": [
+      "vadim",
+      "danil",
+      "kristina",
+      "nikita",
+      "ilya",
+      "aleksey",
+      "mikhail"
+    ],
+    "rotationDirection": "forward",
+    "manualAssignments": {},
+    "replacementHistory": []
+  }
+}
