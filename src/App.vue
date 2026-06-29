@@ -19,7 +19,7 @@ import {
 
 const STORAGE_KEY = "cleaning-calendar-state";
 const THEME_KEY = "cleaning-calendar-theme";
-const DEFAULT_DATA_URL = `/cleaning_calendar//data/company.json`;
+const DEFAULT_DATA_URL = `/cleaning_calendar/data/company.json`;
 
 const state = reactive({
   data: null,
