@@ -2,7 +2,13 @@
   "schemaVersion": 1,
   "company": {
     "name": "Zezeba",
-    "workingDays": [1, 2, 3, 4, 5]
+    "workingDays": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
   },
   "employees": [
     {
@@ -99,7 +105,23 @@
       "mikhail"
     ],
     "rotationDirection": "forward",
-    "manualAssignments": {},
-    "replacementHistory": []
+    "manualAssignments": {
+      "2026-07-02": {
+        "employeeId": "vadim",
+        "replacedEmployeeId": "ilya",
+        "reason": "отпуск",
+        "updatedAt": "2026-06-29T11:34:11.702Z"
+      }
+    },
+    "replacementHistory": [
+      {
+        "id": "aa6fbe61-b6cc-4ec7-82a5-655977b3b16f",
+        "date": "2026-07-02",
+        "employeeId": "vadim",
+        "replacedEmployeeId": "ilya",
+        "reason": "отпуск",
+        "updatedAt": "2026-06-29T11:34:11.702Z"
+      }
+    ]
   }
 }
