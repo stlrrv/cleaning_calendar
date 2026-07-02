@@ -19,7 +19,7 @@ import {
 
 const STORAGE_KEY = "cleaning-calendar-state";
 const THEME_KEY = "cleaning-calendar-theme";
-const DEFAULT_DATA_URL = `/cleaning_calendar/data/company.json`;
+const DEFAULT_DATA_URL = `${import.meta.env.BASE_URL}data/company.json`;
 
 const state = reactive({
   data: null,
@@ -49,16 +49,19 @@ const employeeMap = computed(() => {
 const activeEmployees = computed(
   () => state.data?.employees?.filter((employee) => employee.active) ?? [],
 );
+
 const currentWeekDays = computed(() =>
   getWeekDays(
     state.weekCursor,
     state.data?.company.workingDays ?? [1, 2, 3, 4, 5],
   ),
 );
+
 const todayDate = computed(() => new Date());
 const isCurrentWeek = computed(() =>
   isSameWeek(state.weekCursor, todayDate.value),
 );
+
 const hiddenPastDaysCount = computed(() => {
   if (!isCurrentWeek.value) {
     return 0;
@@ -68,6 +71,7 @@ const hiddenPastDaysCount = computed(() => {
     (date) => date < todayDate.value && !isSameDate(date, todayDate.value),
   ).length;
 });
+
 const visibleWeekDays = computed(() => {
   if (!isCurrentWeek.value || showPastDays.value) {
     return currentWeekDays.value;
@@ -77,9 +81,11 @@ const visibleWeekDays = computed(() => {
     (date) => date >= todayDate.value || isSameDate(date, todayDate.value),
   );
 });
+
 const visibleWeekDayKeys = computed(
   () => new Set(visibleWeekDays.value.map((date) => formatIsoDate(date))),
 );
+
 const weekAssignments = computed(() => {
   if (!state.data) {
     return [];
@@ -87,11 +93,13 @@ const weekAssignments = computed(() => {
 
   return buildWeekSchedule(state.data, state.weekCursor);
 });
+
 const weekLabel = computed(() => getWeekLabel(state.weekCursor));
 const monthLabel = computed(() => getMonthLabel(state.weekCursor));
 const replacementHistory = computed(
   () => state.data?.schedule?.replacementHistory ?? [],
 );
+
 const scheduleRows = computed(() => {
   const assignmentsByDate = new Map(
     weekAssignments.value.map((item) => [item.date, item]),
@@ -104,28 +112,27 @@ const scheduleRows = computed(() => {
       .map((date) => {
         const isoDate = formatIsoDate(date);
         const assignment = assignmentsByDate.get(isoDate);
-        const isAssigned = assignment?.employeeId === employee.id;
 
         return {
           date,
           isoDate,
-          assignment: isAssigned ? assignment : null,
+          assignment: assignment?.employeeId === employee.id ? assignment : null,
         };
       }),
   }));
 });
 
 const tabs = computed(() => {
-  const result = [
+  const items = [
     { value: "schedule", label: "Расписание" },
     { value: "duties", label: "Обязанности" },
   ];
 
   if (state.mode === "edit") {
-    result.splice(1, 0, { value: "settings", label: "Настройки" });
+    items.splice(1, 0, { value: "settings", label: "Настройки" });
   }
 
-  return result;
+  return items;
 });
 
 const rotationDirectionItems = computed(() => [
@@ -133,12 +140,12 @@ const rotationDirectionItems = computed(() => [
   { value: "reverse", label: "По кругу назад" },
 ]);
 
-const employeeItems = computed(() => {
-  return activeEmployees.value.map((emp) => ({
-    value: emp.id,
-    label: emp.name,
-  }));
-});
+const employeeItems = computed(() =>
+  activeEmployees.value.map((employee) => ({
+    value: employee.id,
+    label: employee.name,
+  })),
+);
 
 function createEmployeeId(name) {
   return (
@@ -158,13 +165,8 @@ function persistState() {
 
 function applyTheme(nextTheme) {
   theme.value = nextTheme;
-  if (nextTheme === "light") {
-    document.documentElement.classList.add("light");
-    document.documentElement.classList.remove("dark");
-  } else {
-    document.documentElement.classList.add("dark");
-    document.documentElement.classList.remove("light");
-  }
+  document.documentElement.classList.remove("light", "dark");
+  document.documentElement.classList.add(nextTheme);
   localStorage.setItem(THEME_KEY, nextTheme);
 }
 
@@ -189,15 +191,7 @@ async function initialize() {
 
   try {
     const localTheme = localStorage.getItem(THEME_KEY);
-    // Сначала принудительно установим тему, чтобы классы были применены
-    if (localTheme === "light") {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    }
-    theme.value = localTheme === "light" ? "light" : "dark";
+    applyTheme(localTheme === "light" ? "light" : "dark");
 
     const localState = localStorage.getItem(STORAGE_KEY);
     if (localState) {
@@ -304,6 +298,7 @@ function saveReplacement() {
   const currentAssignment = weekAssignments.value.find(
     (item) => item.date === state.replacementDraft.date,
   );
+
   state.data = replaceAssignment(state.data, {
     date: state.replacementDraft.date,
     employeeId: state.replacementDraft.employeeId,
@@ -396,20 +391,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="app-shell">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">Универсальный календарь уборки</p>
-        <h1>{{ state.data?.company.name || "Компания" }}</h1>
-        <p class="hero-copy">
-          Недельное дежурство по будням, режим просмотра для команды и режим
-          редактирования для администратора.
+  <main
+    class="mx-auto min-h-screen max-w-[1440px] px-4 py-6 text-[var(--app-text)] md:px-6 lg:px-8"
+  >
+    <section
+      class="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_380px]"
+    >
+      <div
+        class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-6 shadow-[var(--app-shadow)] backdrop-blur"
+      >
+        <p
+          class="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+        >
+          Универсальный календарь уборки
+        </p>
+        <h1 class="text-3xl font-semibold tracking-tight md:text-5xl">
+          {{ state.data?.company.name || "Компания" }}
+        </h1>
+        <p class="mt-4 max-w-3xl text-sm leading-6 text-[var(--app-muted)] md:text-base">
+          Интерфейс переведен на связку `b24ui` + Tailwind: системные элементы
+          библиотеки отвечают за действия и формы, а Tailwind управляет
+          раскладкой, ритмом и адаптивностью.
         </p>
       </div>
 
-      <div class="hero-panel">
-        <div class="hero-stat">
-          <span>Режим</span>
+      <div
+        class="grid gap-3 rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-4 shadow-[var(--app-shadow)] backdrop-blur"
+      >
+        <div class="rounded-[22px] bg-[var(--app-surface-strong)] p-4">
+          <div class="mb-3 text-sm text-[var(--app-muted)]">Режим</div>
           <B24FieldGroup>
             <B24Button
               :active="state.mode === 'view'"
@@ -426,54 +436,74 @@ onMounted(() => {
           </B24FieldGroup>
         </div>
 
-        <div class="hero-stat">
-          <span>Тема</span>
+        <div class="rounded-[22px] bg-[var(--app-surface-strong)] p-4">
+          <div class="mb-3 text-sm text-[var(--app-muted)]">Тема</div>
           <B24FieldGroup>
-            <B24Button :active="theme === 'light'" @click="applyTheme('light')">
+            <B24Button
+              :active="theme === 'light'"
+              @click="applyTheme('light')"
+            >
               Светлая
             </B24Button>
-            <B24Button :active="theme === 'dark'" @click="applyTheme('dark')">
+            <B24Button
+              :active="theme === 'dark'"
+              @click="applyTheme('dark')"
+            >
               Темная
             </B24Button>
           </B24FieldGroup>
         </div>
 
-        <div class="hero-stat">
-          <span>Активных сотрудников</span>
-          <strong>{{ activeEmployees.length }}</strong>
+        <div
+          class="flex items-end justify-between rounded-[22px] bg-[var(--app-surface-strong)] px-4 py-5"
+        >
+          <span class="text-sm text-[var(--app-muted)]">Активных сотрудников</span>
+          <strong class="text-3xl font-semibold">{{ activeEmployees.length }}</strong>
         </div>
       </div>
     </section>
 
-    <B24Alert v-if="state.error" type="error">
+    <B24Alert v-if="state.error" type="error" class="mb-4">
       {{ state.error }}
     </B24Alert>
 
-    <section v-if="state.loading" class="loading-state">
+    <div
+      v-if="state.loading"
+      class="rounded-[24px] border border-[var(--app-border)] bg-[var(--app-surface)] p-6 text-sm text-[var(--app-muted)] shadow-[var(--app-shadow)]"
+    >
       Загрузка данных...
-    </section>
+    </div>
 
     <template v-else-if="state.data">
-      <B24Tabs :items="tabs" v-model="state.activeTab" />
+      <div class="mb-5">
+        <B24Tabs v-model="state.activeTab" :items="tabs" />
+      </div>
 
       <template v-if="state.activeTab === 'schedule'">
-        <div class="layout-grid layout-grid--schedule">
-          <div class="panel panel-wide">
-            <div class="card-heading">
+        <section class="grid gap-5 xl:grid-cols-[minmax(0,1.7fr)_360px]">
+          <div
+            class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
+          >
+            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p class="card-label">Расписание</p>
-                <h2>{{ weekLabel }}</h2>
-                <p class="support-text">{{ monthLabel }}</p>
+                <p
+                  class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+                >
+                  Расписание
+                </p>
+                <h2 class="text-2xl font-semibold">{{ weekLabel }}</h2>
+                <p class="mt-2 text-sm text-[var(--app-muted)]">{{ monthLabel }}</p>
               </div>
-              <div class="month-actions">
+
+              <div class="flex gap-2">
                 <B24Button @click="moveWeek(-1)">←</B24Button>
                 <B24Button @click="moveWeek(1)">→</B24Button>
               </div>
             </div>
 
             <div
-              class="toolbar-actions"
               v-if="isCurrentWeek && hiddenPastDaysCount"
+              class="mb-4"
             >
               <B24Button
                 color="air-tertiary"
@@ -487,31 +517,45 @@ onMounted(() => {
               </B24Button>
             </div>
 
-            <div class="schedule-table-wrap">
-              <table class="schedule-table">
+            <div class="overflow-x-auto">
+              <table class="min-w-[760px] w-full border-separate border-spacing-y-3">
                 <thead>
                   <tr>
-                    <th>Сотрудник</th>
+                    <th class="px-3 pb-2 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]">
+                      Сотрудник
+                    </th>
                     <th
                       v-for="date in visibleWeekDays"
                       :key="formatIsoDate(date)"
+                      class="px-3 pb-2 text-left"
                     >
-                      <div class="schedule-head">
-                        <span>{{ getWeekdayLabel(date) }}</span>
-                        <strong>{{ formatDisplayDate(date) }}</strong>
+                      <div class="flex flex-col gap-1">
+                        <span class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]">
+                          {{ getWeekdayLabel(date) }}
+                        </span>
+                        <strong class="text-sm font-semibold">
+                          {{ formatDisplayDate(date) }}
+                        </strong>
                       </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="row in scheduleRows" :key="row.employee.id">
-                    <td class="employee-cell">{{ row.employee.name }}</td>
+                    <td
+                      class="rounded-l-[20px] border-y border-l border-[var(--app-border)] bg-[var(--app-surface-strong)] px-3 py-4 font-semibold"
+                    >
+                      {{ row.employee.name }}
+                    </td>
                     <td
                       v-for="cell in row.cells"
                       :key="cell.isoDate"
-                      class="assignment-cell"
+                      class="border-y border-[var(--app-border)] bg-[var(--app-surface-strong)] px-3 py-4 last:rounded-r-[20px] last:border-r"
                     >
-                      <div v-if="cell.assignment" class="assignment-card">
+                      <div
+                        v-if="cell.assignment"
+                        class="flex min-h-[88px] flex-col items-start gap-2"
+                      >
                         <B24Badge
                           :color="
                             cell.assignment.isManual
@@ -521,6 +565,7 @@ onMounted(() => {
                         >
                           {{ cell.assignment.isManual ? "Замена" : "Дежурный" }}
                         </B24Badge>
+
                         <template v-if="state.mode === 'edit'">
                           <B24Button
                             size="sm"
@@ -545,66 +590,73 @@ onMounted(() => {
             </div>
           </div>
 
-          <div class="panel">
-            <div class="card-heading">
-              <div>
-                <p class="card-label">История</p>
-                <h2>Последние замены</h2>
-              </div>
+          <div
+            class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
+          >
+            <div class="mb-5">
+              <p
+                class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+              >
+                История
+              </p>
+              <h2 class="text-2xl font-semibold">Последние замены</h2>
             </div>
 
-            <div class="history-list">
+            <div class="grid gap-3">
               <article
                 v-for="entry in replacementHistory"
                 :key="entry.id"
-                class="history-item"
+                class="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-surface-strong)] p-4"
               >
-                <div>
-                  <h3>{{ formatDisplayDate(new Date(entry.date)) }}</h3>
-                  <p>
-                    {{
-                      employeeMap.get(entry.replacedEmployeeId)?.name ||
-                      "Автораспределение"
-                    }}
-                    →
-                    {{
-                      employeeMap.get(entry.employeeId)?.name ||
-                      "Неизвестный сотрудник"
-                    }}
-                  </p>
-                </div>
-                <p class="history-reason">
+                <h3 class="text-base font-semibold">
+                  {{ formatDisplayDate(new Date(entry.date)) }}
+                </h3>
+                <p class="mt-2 text-sm leading-6 text-[var(--app-muted)]">
+                  {{
+                    employeeMap.get(entry.replacedEmployeeId)?.name ||
+                    "Автораспределение"
+                  }}
+                  →
+                  {{
+                    employeeMap.get(entry.employeeId)?.name ||
+                    "Неизвестный сотрудник"
+                  }}
+                </p>
+                <p class="mt-3 text-sm text-[var(--app-muted)]">
                   {{ entry.reason || "Без комментария" }}
                 </p>
               </article>
-              <p v-if="!replacementHistory.length" class="support-text">
+
+              <p v-if="!replacementHistory.length" class="text-sm text-[var(--app-muted)]">
                 Пока замен не было.
               </p>
             </div>
           </div>
-        </div>
+        </section>
       </template>
 
-      <template
-        v-else-if="state.activeTab === 'settings' && state.mode === 'edit'"
-      >
-        <div class="layout-grid">
-          <div class="panel">
-            <div class="card-heading">
-              <div>
-                <p class="card-label">Основные настройки</p>
-                <h2>Компания и данные</h2>
-              </div>
+      <template v-else-if="state.activeTab === 'settings' && state.mode === 'edit'">
+        <section class="grid gap-5 xl:grid-cols-2">
+          <div
+            class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
+          >
+            <div class="mb-5">
+              <p
+                class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+              >
+                Основные настройки
+              </p>
+              <h2 class="text-2xl font-semibold">Компания и данные</h2>
             </div>
 
-            <div class="form-grid">
-              <label class="field">
-                <span>Название компании</span>
+            <div class="grid gap-4">
+              <label class="grid gap-2">
+                <span class="text-sm text-[var(--app-muted)]">Название компании</span>
                 <B24Input v-model="state.data.company.name" />
               </label>
 
-              <label class="field">
-                <span>Направление круга</span>
+              <label class="grid gap-2">
+                <span class="text-sm text-[var(--app-muted)]">Направление круга</span>
                 <B24Select
                   v-model="state.data.schedule.rotationDirection"
                   :items="rotationDirectionItems"
@@ -612,13 +664,13 @@ onMounted(() => {
               </label>
             </div>
 
-            <div class="stack-item-actions">
-              <B24Button color="air-tertiary" @click="triggerImport"
-                >Импорт JSON</B24Button
-              >
-              <B24Button color="air-tertiary" @click="exportJson"
-                >Экспорт JSON</B24Button
-              >
+            <div class="mt-5 flex flex-wrap gap-2">
+              <B24Button color="air-tertiary" @click="triggerImport">
+                Импорт JSON
+              </B24Button>
+              <B24Button color="air-tertiary" @click="exportJson">
+                Экспорт JSON
+              </B24Button>
               <B24Button color="air-danger" @click="resetToRepositoryState">
                 Сбросить к версии из Git
               </B24Button>
@@ -628,22 +680,28 @@ onMounted(() => {
               ref="importFileInput"
               type="file"
               accept="application/json"
-              class="visually-hidden"
+              class="sr-only"
               @change="handleImport"
             />
           </div>
 
-          <div class="panel">
-            <div class="card-heading">
+          <div
+            class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
+          >
+            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p class="card-label">Ротация команды</p>
-                <h2>Сотрудники</h2>
+                <p
+                  class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+                >
+                  Ротация команды
+                </p>
+                <h2 class="text-2xl font-semibold">Сотрудники</h2>
               </div>
               <B24Button @click="addEmployee">Добавить</B24Button>
             </div>
 
-            <p class="support-text">
-              Порядок круга сейчас такой:
+            <p class="mb-4 text-sm leading-6 text-[var(--app-muted)]">
+              Порядок круга:
               {{
                 state.data.schedule.rotationOrder
                   .map((employeeId) => employeeMap.get(employeeId)?.name)
@@ -652,94 +710,111 @@ onMounted(() => {
               }}
             </p>
 
-            <div class="stack-list">
+            <div class="grid gap-3">
               <article
                 v-for="employee in state.data.employees"
                 :key="employee.id"
-                class="stack-item"
+                class="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-surface-strong)] p-4"
               >
-                <label class="field">
-                  <span>Имя</span>
-                  <B24Input v-model="employee.name" />
-                </label>
-                <div class="stack-item-actions">
-                  <label class="toggle-row">
+                <div class="grid gap-4">
+                  <label class="grid gap-2">
+                    <span class="text-sm text-[var(--app-muted)]">Имя</span>
+                    <B24Input v-model="employee.name" />
+                  </label>
+
+                  <label class="flex items-center gap-3 text-sm text-[var(--app-muted)]">
                     <B24Checkbox v-model="employee.active" />
                     <span>Участвует в ротации</span>
                   </label>
+
+                  <div>
+                    <B24Button
+                      color="air-tertiary"
+                      @click="removeEmployee(employee.id)"
+                    >
+                      Удалить
+                    </B24Button>
+                  </div>
                 </div>
-                <B24Button
-                  color="air-tertiary"
-                  @click="removeEmployee(employee.id)"
-                >
-                  Удалить
-                </B24Button>
               </article>
             </div>
           </div>
-        </div>
+        </section>
       </template>
 
       <template v-else-if="state.activeTab === 'duties'">
-        <div class="panel panel-wide">
-          <div class="card-heading">
+        <section
+          class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
+        >
+          <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p class="card-label">Обязанности</p>
-              <h2>Что нужно сделать</h2>
+              <p
+                class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
+              >
+                Обязанности
+              </p>
+              <h2 class="text-2xl font-semibold">Что нужно сделать</h2>
             </div>
-            <B24Button v-if="state.mode === 'edit'" @click="addDuty"
-              >Добавить</B24Button
-            >
+            <B24Button v-if="state.mode === 'edit'" @click="addDuty">
+              Добавить
+            </B24Button>
           </div>
 
-          <div class="duties-list">
+          <div class="grid gap-3 md:grid-cols-2">
             <article
               v-for="duty in state.data.duties"
               :key="duty.id"
-              class="duty-card"
+              class="rounded-[20px] border border-[var(--app-border)] bg-[var(--app-surface-strong)] p-4"
             >
               <template v-if="state.mode === 'edit'">
-                <label class="field">
-                  <span>Заголовок</span>
-                  <B24Input v-model="duty.title" />
-                </label>
-                <label class="field">
-                  <span>Описание</span>
-                  <B24Textarea v-model="duty.description" rows="3" />
-                </label>
-                <div class="stack-item-actions">
-                  <B24Button color="air-tertiary" @click="removeDuty(duty.id)"
-                    >Удалить</B24Button
-                  >
+                <div class="grid gap-4">
+                  <label class="grid gap-2">
+                    <span class="text-sm text-[var(--app-muted)]">Заголовок</span>
+                    <B24Input v-model="duty.title" />
+                  </label>
+
+                  <label class="grid gap-2">
+                    <span class="text-sm text-[var(--app-muted)]">Описание</span>
+                    <B24Textarea v-model="duty.description" rows="3" />
+                  </label>
+
+                  <div>
+                    <B24Button color="air-tertiary" @click="removeDuty(duty.id)">
+                      Удалить
+                    </B24Button>
+                  </div>
                 </div>
               </template>
+
               <template v-else>
-                <h3>{{ duty.title }}</h3>
-                <p>{{ duty.description }}</p>
+                <h3 class="text-lg font-semibold">{{ duty.title }}</h3>
+                <p class="mt-3 text-sm leading-6 text-[var(--app-muted)]">
+                  {{ duty.description }}
+                </p>
               </template>
             </article>
           </div>
-        </div>
+        </section>
       </template>
     </template>
 
     <B24Modal v-model:open="showReplacementModal" title="Ручная замена">
       <template #body>
-        <div class="modal-body">
-          <p class="support-text">
+        <div class="grid gap-4">
+          <p class="text-sm text-[var(--app-muted)]">
             {{ formatDisplayDate(new Date(state.replacementDraft.date)) }}
           </p>
 
-          <label class="field">
-            <span>Новый дежурный</span>
+          <label class="grid gap-2">
+            <span class="text-sm text-[var(--app-muted)]">Новый дежурный</span>
             <B24Select
               v-model="state.replacementDraft.employeeId"
               :items="employeeItems"
             />
           </label>
 
-          <label class="field">
-            <span>Причина замены</span>
+          <label class="grid gap-2">
+            <span class="text-sm text-[var(--app-muted)]">Причина замены</span>
             <B24Textarea
               v-model="state.replacementDraft.reason"
               rows="3"
@@ -750,9 +825,9 @@ onMounted(() => {
       </template>
 
       <template #footer>
-        <B24Button color="air-tertiary" @click="showReplacementModal = false"
-          >Отмена</B24Button
-        >
+        <B24Button color="air-tertiary" @click="showReplacementModal = false">
+          Отмена
+        </B24Button>
         <B24Button @click="saveReplacement">Сохранить замену</B24Button>
       </template>
     </B24Modal>
