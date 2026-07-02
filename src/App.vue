@@ -116,7 +116,8 @@ const scheduleRows = computed(() => {
         return {
           date,
           isoDate,
-          assignment: assignment?.employeeId === employee.id ? assignment : null,
+          assignment:
+            assignment?.employeeId === employee.id ? assignment : null,
         };
       }),
   }));
@@ -394,24 +395,22 @@ onMounted(() => {
   <main
     class="mx-auto min-h-screen max-w-[1440px] px-4 py-6 text-[var(--app-text)] md:px-6 lg:px-8"
   >
-    <section
-      class="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_380px]"
-    >
+    <section class="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_380px]">
       <div
         class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-6 shadow-[var(--app-shadow)] backdrop-blur"
       >
         <p
           class="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
         >
-          Универсальный календарь уборки
+          Универсальный календарь держурств
         </p>
         <h1 class="text-3xl font-semibold tracking-tight md:text-5xl">
           {{ state.data?.company.name || "Компания" }}
         </h1>
-        <p class="mt-4 max-w-3xl text-sm leading-6 text-[var(--app-muted)] md:text-base">
-          Интерфейс переведен на связку `b24ui` + Tailwind: системные элементы
-          библиотеки отвечают за действия и формы, а Tailwind управляет
-          раскладкой, ритмом и адаптивностью.
+        <p
+          class="mt-4 max-w-3xl text-sm leading-6 text-[var(--app-muted)] md:text-base"
+        >
+          Кто держурный?
         </p>
       </div>
 
@@ -439,16 +438,10 @@ onMounted(() => {
         <div class="rounded-[22px] bg-[var(--app-surface-strong)] p-4">
           <div class="mb-3 text-sm text-[var(--app-muted)]">Тема</div>
           <B24FieldGroup>
-            <B24Button
-              :active="theme === 'light'"
-              @click="applyTheme('light')"
-            >
+            <B24Button :active="theme === 'light'" @click="applyTheme('light')">
               Светлая
             </B24Button>
-            <B24Button
-              :active="theme === 'dark'"
-              @click="applyTheme('dark')"
-            >
+            <B24Button :active="theme === 'dark'" @click="applyTheme('dark')">
               Темная
             </B24Button>
           </B24FieldGroup>
@@ -457,8 +450,12 @@ onMounted(() => {
         <div
           class="flex items-end justify-between rounded-[22px] bg-[var(--app-surface-strong)] px-4 py-5"
         >
-          <span class="text-sm text-[var(--app-muted)]">Активных сотрудников</span>
-          <strong class="text-3xl font-semibold">{{ activeEmployees.length }}</strong>
+          <span class="text-sm text-[var(--app-muted)]"
+            >Активных сотрудников</span
+          >
+          <strong class="text-3xl font-semibold">{{
+            activeEmployees.length
+          }}</strong>
         </div>
       </div>
     </section>
@@ -484,7 +481,9 @@ onMounted(() => {
           <div
             class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
           >
-            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div
+              class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+            >
               <div>
                 <p
                   class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
@@ -492,7 +491,9 @@ onMounted(() => {
                   Расписание
                 </p>
                 <h2 class="text-2xl font-semibold">{{ weekLabel }}</h2>
-                <p class="mt-2 text-sm text-[var(--app-muted)]">{{ monthLabel }}</p>
+                <p class="mt-2 text-sm text-[var(--app-muted)]">
+                  {{ monthLabel }}
+                </p>
               </div>
 
               <div class="flex gap-2">
@@ -501,10 +502,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <div
-              v-if="isCurrentWeek && hiddenPastDaysCount"
-              class="mb-4"
-            >
+            <div v-if="isCurrentWeek && hiddenPastDaysCount" class="mb-4">
               <B24Button
                 color="air-tertiary"
                 @click="showPastDays = !showPastDays"
@@ -518,10 +516,14 @@ onMounted(() => {
             </div>
 
             <div class="overflow-x-auto">
-              <table class="min-w-[760px] w-full border-separate border-spacing-y-3">
+              <table
+                class="min-w-[760px] w-full border-separate border-spacing-y-3"
+              >
                 <thead>
                   <tr>
-                    <th class="px-3 pb-2 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]">
+                    <th
+                      class="px-3 pb-2 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]"
+                    >
                       Сотрудник
                     </th>
                     <th
@@ -530,7 +532,9 @@ onMounted(() => {
                       class="px-3 pb-2 text-left"
                     >
                       <div class="flex flex-col gap-1">
-                        <span class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]">
+                        <span
+                          class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--app-muted)]"
+                        >
                           {{ getWeekdayLabel(date) }}
                         </span>
                         <strong class="text-sm font-semibold">
@@ -627,7 +631,10 @@ onMounted(() => {
                 </p>
               </article>
 
-              <p v-if="!replacementHistory.length" class="text-sm text-[var(--app-muted)]">
+              <p
+                v-if="!replacementHistory.length"
+                class="text-sm text-[var(--app-muted)]"
+              >
                 Пока замен не было.
               </p>
             </div>
@@ -635,7 +642,9 @@ onMounted(() => {
         </section>
       </template>
 
-      <template v-else-if="state.activeTab === 'settings' && state.mode === 'edit'">
+      <template
+        v-else-if="state.activeTab === 'settings' && state.mode === 'edit'"
+      >
         <section class="grid gap-5 xl:grid-cols-2">
           <div
             class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
@@ -651,12 +660,16 @@ onMounted(() => {
 
             <div class="grid gap-4">
               <label class="grid gap-2">
-                <span class="text-sm text-[var(--app-muted)]">Название компании</span>
+                <span class="text-sm text-[var(--app-muted)]"
+                  >Название компании</span
+                >
                 <B24Input v-model="state.data.company.name" />
               </label>
 
               <label class="grid gap-2">
-                <span class="text-sm text-[var(--app-muted)]">Направление круга</span>
+                <span class="text-sm text-[var(--app-muted)]"
+                  >Направление круга</span
+                >
                 <B24Select
                   v-model="state.data.schedule.rotationDirection"
                   :items="rotationDirectionItems"
@@ -688,7 +701,9 @@ onMounted(() => {
           <div
             class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
           >
-            <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div
+              class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+            >
               <div>
                 <p
                   class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
@@ -722,7 +737,9 @@ onMounted(() => {
                     <B24Input v-model="employee.name" />
                   </label>
 
-                  <label class="flex items-center gap-3 text-sm text-[var(--app-muted)]">
+                  <label
+                    class="flex items-center gap-3 text-sm text-[var(--app-muted)]"
+                  >
                     <B24Checkbox v-model="employee.active" />
                     <span>Участвует в ротации</span>
                   </label>
@@ -746,7 +763,9 @@ onMounted(() => {
         <section
           class="rounded-[28px] border border-[var(--app-border)] bg-[var(--app-surface)] p-5 shadow-[var(--app-shadow)]"
         >
-          <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div
+            class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+          >
             <div>
               <p
                 class="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--app-accent)]"
@@ -769,17 +788,24 @@ onMounted(() => {
               <template v-if="state.mode === 'edit'">
                 <div class="grid gap-4">
                   <label class="grid gap-2">
-                    <span class="text-sm text-[var(--app-muted)]">Заголовок</span>
+                    <span class="text-sm text-[var(--app-muted)]"
+                      >Заголовок</span
+                    >
                     <B24Input v-model="duty.title" />
                   </label>
 
                   <label class="grid gap-2">
-                    <span class="text-sm text-[var(--app-muted)]">Описание</span>
+                    <span class="text-sm text-[var(--app-muted)]"
+                      >Описание</span
+                    >
                     <B24Textarea v-model="duty.description" rows="3" />
                   </label>
 
                   <div>
-                    <B24Button color="air-tertiary" @click="removeDuty(duty.id)">
+                    <B24Button
+                      color="air-tertiary"
+                      @click="removeDuty(duty.id)"
+                    >
                       Удалить
                     </B24Button>
                   </div>
