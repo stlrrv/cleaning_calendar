@@ -2,7 +2,13 @@
   "schemaVersion": 1,
   "company": {
     "name": "Zezeba",
-    "workingDays": [1, 2, 3, 4, 5]
+    "workingDays": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
   },
   "employees": [
     {
@@ -32,12 +38,27 @@
     },
     {
       "id": "aleksey",
-      "name": "Алексей",
+      "name": "Алекс",
       "active": true
     },
     {
       "id": "mikhail",
       "name": "Михаил",
+      "active": true
+    },
+    {
+      "id": "новый-сотрудник-8-1784531920273",
+      "name": "Алексей ",
+      "active": true
+    },
+    {
+      "id": "новый-сотрудник-9-1784531970823",
+      "name": "Кирилл",
+      "active": true
+    },
+    {
+      "id": "новый-сотрудник-10-1784531974941",
+      "name": "Ефим",
       "active": true
     }
   ],
@@ -96,10 +117,29 @@
       "nikita",
       "ilya",
       "aleksey",
-      "mikhail"
+      "mikhail",
+      "новый-сотрудник-8-1784531920273",
+      "новый-сотрудник-9-1784531970823",
+      "новый-сотрудник-10-1784531974941"
     ],
     "rotationDirection": "forward",
-    "manualAssignments": {},
-    "replacementHistory": []
+    "manualAssignments": {
+      "2026-07-16": {
+        "employeeId": "mikhail",
+        "replacedEmployeeId": "vadim",
+        "reason": "пропустил",
+        "updatedAt": "2026-07-16T09:00:15.500Z"
+      }
+    },
+    "replacementHistory": [
+      {
+        "id": "9817708a-ed9e-457b-aa4b-4d2a9cfa7835",
+        "date": "2026-07-16",
+        "employeeId": "mikhail",
+        "replacedEmployeeId": "vadim",
+        "reason": "пропустил",
+        "updatedAt": "2026-07-16T09:00:15.500Z"
+      }
+    ]
   }
 }
