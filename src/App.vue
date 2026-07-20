@@ -17,8 +17,6 @@ import {
   isSameWeek,
 } from "./lib/date.js";
 
-const STORAGE_KEY = "cleaning-calendar-state";
-const THEME_KEY = "cleaning-calendar-theme";
 const DEFAULT_DATA_URL = `${import.meta.env.BASE_URL}data/company.json`;
 
 const state = reactive({
@@ -158,22 +156,14 @@ function createEmployeeId(name) {
   );
 }
 
-function persistState() {
-  if (state.data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-  }
-}
-
 function applyTheme(nextTheme) {
   theme.value = nextTheme;
   document.documentElement.classList.remove("light", "dark");
   document.documentElement.classList.add(nextTheme);
-  localStorage.setItem(THEME_KEY, nextTheme);
 }
 
 function setData(nextData) {
   state.data = normalizeState(nextData);
-  persistState();
 }
 
 async function loadDefaultState() {
@@ -191,16 +181,8 @@ async function initialize() {
   state.error = "";
 
   try {
-    const localTheme = localStorage.getItem(THEME_KEY);
-    applyTheme(localTheme === "light" ? "light" : "dark");
-
-    const localState = localStorage.getItem(STORAGE_KEY);
-    if (localState) {
-      state.data = normalizeState(JSON.parse(localState));
-    } else {
-      state.data = await loadDefaultState();
-      persistState();
-    }
+    applyTheme("dark");
+    state.data = await loadDefaultState();
   } catch (error) {
     state.error =
       error instanceof Error
@@ -232,7 +214,6 @@ function addEmployee() {
     active: true,
   });
   state.data.schedule.rotationOrder.push(id);
-  persistState();
 }
 
 function removeEmployee(employeeId) {
@@ -252,8 +233,6 @@ function removeEmployee(employeeId) {
       delete state.data.schedule.manualAssignments[date];
     }
   });
-
-  persistState();
 }
 
 function addDuty() {
@@ -266,7 +245,6 @@ function addDuty() {
     title: "Новая обязанность",
     description: "",
   });
-  persistState();
 }
 
 function removeDuty(dutyId) {
@@ -275,7 +253,6 @@ function removeDuty(dutyId) {
   }
 
   state.data.duties = state.data.duties.filter((duty) => duty.id !== dutyId);
-  persistState();
 }
 
 function openReplacementDialog(item) {
@@ -307,7 +284,6 @@ function saveReplacement() {
     reason: state.replacementDraft.reason,
   });
   showReplacementModal.value = false;
-  persistState();
 }
 
 function resetReplacement(date) {
@@ -316,7 +292,6 @@ function resetReplacement(date) {
   }
 
   state.data = clearManualAssignment(state.data, date);
-  persistState();
 }
 
 function triggerImport() {
@@ -368,14 +343,6 @@ async function resetToRepositoryState() {
         : "Не удалось перезагрузить стартовый JSON";
   }
 }
-
-watch(
-  () => state.data,
-  () => {
-    persistState();
-  },
-  { deep: true },
-);
 
 watch(
   () => state.mode,
